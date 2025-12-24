@@ -52,21 +52,48 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // Contact Form EmailJS Integration
-const contactForm = document.getElementById('contact-form');
+const contactForm = document.getElementById('request-callback-form');
 if (contactForm) {
   contactForm.addEventListener('submit', function (event) {
     event.preventDefault();
+
     const btn = contactForm.querySelector('button[type="submit"]');
     const originalText = btn.innerText;
     btn.innerText = 'Sending...';
     btn.disabled = true;
 
-    // Replace these with your actual Service ID and Template ID
-    const serviceID = 'YOUR_SERVICE_ID';
-    const templateID = 'YOUR_TEMPLATE_ID';
+    // Extracting values for templateParams
+    const templateParams = {
+      institution: contactForm.institution.value,
+      batch_size: contactForm.batch_size.value,
+      preferred_destinations: contactForm.preferred_destinations.value,
+      no_of_days: contactForm.no_of_days.value,
+      email: contactForm.email.value,
+      mobile_number: contactForm.mobile_number.value,
+      current_location: contactForm.current_location.value,
+      message: contactForm.message.value,
+      date: new Date().toLocaleString()
+    };
 
-    emailjs.sendForm(serviceID, templateID, this)
+    // Use centralized configuration from config.js
+    const serviceID = ENV_CONFIG.EMAILJS.SERVICE_ID;
+    const templateID = ENV_CONFIG.EMAILJS.TEMPLATE_ID;
+    const publicKey = ENV_CONFIG.EMAILJS.PUBLIC_KEY;
+
+    // Basic spam protection: Prevent multiple submissions in a short window
+    const lastSubmission = localStorage.getItem('last_submission_time');
+    const now = Date.now();
+    if (lastSubmission && (now - lastSubmission < 60000)) { // 1 minute cooldown
+      alert('Please wait a moment before sending another request.');
+      btn.innerText = originalText;
+      btn.disabled = false;
+      return;
+    }
+
+    emailjs.send(serviceID, templateID, templateParams, publicKey)
       .then(() => {
+        console.log("Query Sent Successfully");
+        localStorage.setItem('last_submission_time', Date.now());
         btn.innerText = 'Sent!';
         alert('Thank you! Your request has been sent successfully.');
         contactForm.reset();
@@ -74,11 +101,12 @@ if (contactForm) {
           btn.innerText = originalText;
           btn.disabled = false;
         }, 3000);
-      }, (err) => {
+      })
+      .catch((err) => {
+        console.error('Failed to send', err);
         btn.innerText = originalText;
         btn.disabled = false;
-        alert(JSON.stringify(err));
-        console.error('EmailJS Error:', err);
+        alert('Failed to send message. Please try again later.');
       });
   });
 }
