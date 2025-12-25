@@ -1,7 +1,7 @@
 const ENV_CONFIG = {
     // EmailJS Configuration
     EMAILJS: {
-        SERVICE_ID: 'service_q3fnbcm',
+        SERVICE_ID: 'service_lb98pyc',
         TEMPLATE_ID: 'template_2usmrbk',
         PUBLIC_KEY: 'BtJbPz8o578STsT2Q'
     },
