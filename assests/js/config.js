@@ -8,6 +8,10 @@ const ENV_CONFIG = {
     // Google Analytics Configuration
     GA: {
         MEASUREMENT_ID: 'G-VMWERFWQWL'
+    },
+    // WhatsApp Configuration
+    WHATSAPP: {
+        NUMBER: '919940700442'
     }
 };
 

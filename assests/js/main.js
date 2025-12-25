@@ -95,7 +95,24 @@ if (contactForm) {
         console.log("Query Sent Successfully");
         localStorage.setItem('last_submission_time', Date.now());
         btn.innerText = 'Sent!';
-        alert('Thank you! Your request has been sent successfully.');
+
+        // WhatsApp Integration
+        const whatsappNumber = ENV_CONFIG.WHATSAPP.NUMBER;
+        const message = `*New Callback Request Received*%0A%0A` +
+          `*Institution:* ${templateParams.institution}%0A` +
+          `*Batch Size:* ${templateParams.batch_size}%0A` +
+          `*Destinations:* ${templateParams.preferred_destinations}%0A` +
+          `*Days:* ${templateParams.no_of_days}%0A` +
+          `*Mobile:* ${templateParams.mobile_number}%0A` +
+          `*Email:* ${templateParams.email}%0A` +
+          `*Location:* ${templateParams.current_location}%0A` +
+          `*Message:* ${templateParams.message}%0A%0A` +
+          `_Sent from Global Holidays Website_`;
+
+        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${message}`;
+        window.open(whatsappUrl, '_blank');
+
+        alert('Thank you! Your request has been sent successfully and redirected to WhatsApp.');
         contactForm.reset();
         setTimeout(() => {
           btn.innerText = originalText;
